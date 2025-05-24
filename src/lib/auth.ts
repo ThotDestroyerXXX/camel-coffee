@@ -10,7 +10,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  plugins: [phoneNumber()],
+
   user: {
     additionalFields: {
       role: {
@@ -33,4 +33,8 @@ export const auth = betterAuth({
       },
     },
   },
+
+  plugins: [phoneNumber()],
 });
+
+export type Session = typeof auth.$Infer.Session;

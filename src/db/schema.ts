@@ -8,7 +8,21 @@ import {
   decimal,
   uuid,
   uniqueIndex,
+  pgEnum,
 } from "drizzle-orm/pg-core";
+
+/* Enum Types */
+
+export const roleEnum = pgEnum("role", ["admin", "customer", "seller"]);
+export const orderTypeEnum = pgEnum("order_type", ["delivery", "pickup"]);
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending",
+  "in progress",
+  "completed",
+  "cancelled",
+]);
+export const itemTypeEnum = pgEnum("item_type", ["food", "drink"]);
+export const drinkTypeEnum = pgEnum("drink_type", ["coffee", "non-coffee"]);
 
 /* Better Auth schema */
 export const user = pgTable("user", {
@@ -27,7 +41,7 @@ export const user = pgTable("user", {
     .notNull(),
   phoneNumber: text("phone_number").unique(),
   phoneNumberVerified: boolean("phone_number_verified"),
-  role: text("role").default("customer").notNull(),
+  role: roleEnum("role").notNull().default("customer"),
   google_map_address: text("google_map_address"),
   latitude: text("latitude"),
   longitude: text("longitude"),
@@ -99,8 +113,8 @@ export const item = pgTable("item", {
   name: text("name").notNull(),
   description: text("description").notNull(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-  type: text("type").notNull(),
-  drink_type: text("drink_type"),
+  type: itemTypeEnum("type").notNull(),
+  drink_type: drinkTypeEnum("drink_type"),
   image_url: text("image_url").notNull(),
   is_available: boolean("is_available").notNull().default(true),
   created_at: timestamp("created_at").notNull().defaultNow(),
@@ -204,11 +218,11 @@ export const order = pgTable(
     grand_total: numeric("grand_total", { precision: 10, scale: 2 }).notNull(),
     delivery_price: numeric("delivery_price", { precision: 10, scale: 2 }),
     tax_price: numeric("tax_price", { precision: 10, scale: 2 }),
-    type: text("type").notNull(),
+    type: orderTypeEnum("type").notNull(),
     delivery_address: text("delivery_address"),
     latitude: decimal("latitude", { precision: 10, scale: 8 }),
     longitude: decimal("longitude", { precision: 11, scale: 8 }),
-    status: text("status").notNull(),
+    status: orderStatusEnum("status").notNull().default("pending"),
     created_at: timestamp("created_at").notNull().defaultNow(),
     updated_at: timestamp("updated_at")
       .notNull()
@@ -269,7 +283,7 @@ export const drink_option_value = pgTable(
       scale: 2,
     }).notNull(),
   },
-  (t) => [uniqueIndex("idx_drink_option_value_name").on(t.drink_option_type_id)]
+  (t) => [uniqueIndex("idx_drink_option_value_name").on(t.name)]
 );
 
 export const order_item_option = pgTable("order_item_option", {

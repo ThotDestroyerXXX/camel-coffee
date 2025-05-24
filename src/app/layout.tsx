@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TRPCProvider } from "@/trpc/client";
+import Navbar from "@/components/navbar/navbar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import LayoutSidebar from "@/components/sidebar/layout-sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +32,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TRPCProvider>{children}</TRPCProvider>
+        <TRPCProvider>
+          <SidebarProvider defaultOpen={true}>
+            <LayoutSidebar />
+            <div className='w-full'>
+              <SidebarInset>
+                <Navbar />
+                {children}
+                <Toaster richColors expand={true} visibleToasts={6} />
+              </SidebarInset>
+            </div>
+          </SidebarProvider>
+        </TRPCProvider>
       </body>
     </html>
   );
