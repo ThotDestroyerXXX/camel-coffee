@@ -1,7 +1,9 @@
 import CreateMenuView from "@/modules/admin/menu/ui/views/create-menu-view";
-import { HydrateClient } from "@/trpc/server";
+import { HydrateClient, trpc } from "@/trpc/server";
 
 export default function Page() {
+  void trpc.drinkOption.getMany.prefetch();
+
   return (
     <HydrateClient>
       <CreateMenuView />

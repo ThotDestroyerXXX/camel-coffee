@@ -1,4 +1,5 @@
 import { authClient } from "@/lib/auth-client";
+import { trpc } from "@/trpc/client";
 import { userValidation } from "@/validations/user";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -6,7 +7,7 @@ import { toast } from "sonner";
 
 export const RegisterHandler = (setLoading: (loading: boolean) => void) => {
   const router = useRouter();
-
+  const utils = trpc.useUtils();
   const OnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -43,10 +44,11 @@ export const RegisterHandler = (setLoading: (loading: boolean) => void) => {
           onRequest: () => {
             setLoading(true);
           },
-          onSuccess: () => {
+          onSuccess: async () => {
+            await utils.invalidate();
             toast.success("Registration successful");
             router.push("/");
-            setLoading(false);
+            router.refresh();
           },
           onError: (ctx) => {
             toast.error(ctx.error.message);
@@ -54,13 +56,10 @@ export const RegisterHandler = (setLoading: (loading: boolean) => void) => {
           },
         }
       );
-      setLoading(false);
       return data;
     } catch (error) {
       console.log(error);
       toast.error("An error occurred while processing your request");
-      setLoading(false);
-    } finally {
       setLoading(false);
     }
   };

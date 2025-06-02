@@ -1,17 +1,13 @@
-import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../init";
+import { menuRouter } from "@/modules/admin/menu/server/menu/procedure";
+import { createTRPCRouter } from "../init";
+import { drinkOptionRouter } from "@/modules/admin/menu/server/drink-option/procedure";
+import { userRouter } from "@/modules/admin/users/ui/server/procedure";
+import { branchRouter } from "@/modules/admin/branch/server/procedure";
 export const appRouter = createTRPCRouter({
-  hello: protectedProcedure
-    .input(
-      z.object({
-        text: z.string(),
-      })
-    )
-    .query((opts) => {
-      return {
-        greeting: `hello ${opts.ctx.userId} ${opts.ctx.userRole} ${opts.input.text}`,
-      };
-    }),
+  drinkOption: drinkOptionRouter,
+  menu: menuRouter,
+  user: userRouter,
+  branch: branchRouter,
 });
 // export type definition of API
 export type AppRouter = typeof appRouter;

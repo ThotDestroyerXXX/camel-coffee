@@ -9,6 +9,7 @@ import {
   uuid,
   uniqueIndex,
   pgEnum,
+  time,
 } from "drizzle-orm/pg-core";
 
 /* Enum Types */
@@ -23,6 +24,15 @@ export const orderStatusEnum = pgEnum("order_status", [
 ]);
 export const itemTypeEnum = pgEnum("item_type", ["food", "drink"]);
 export const drinkTypeEnum = pgEnum("drink_type", ["coffee", "non-coffee"]);
+export const dayEnum = pgEnum("day", [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+]);
 
 /* Better Auth schema */
 export const user = pgTable("user", {
@@ -301,7 +311,7 @@ export const order_item_option = pgTable("order_item_option", {
   ),
 });
 
-/* branch item */
+/* branch */
 
 export const branch_item_stock = pgTable(
   "branch_item_stock",
@@ -318,6 +328,25 @@ export const branch_item_stock = pgTable(
   },
   (t) => [
     uniqueIndex("idx_branch_item_stock_branch_item").on(t.branch_id, t.item_id),
+  ]
+);
+
+export const branch_operating_hours = pgTable(
+  "branch_operating_hours",
+  {
+    branch_id: text("branch_id")
+      .references(() => branch.id, { onDelete: "cascade" })
+      .notNull(),
+    day_of_week: dayEnum("day_of_week").notNull(),
+    opening_time: time("opening_time").notNull(),
+    closing_time: time("closing_time").notNull(),
+    is_closed: boolean("is_closed").notNull().default(false),
+  },
+  (t) => [
+    uniqueIndex("idx_branch_operating_hours_branch_day").on(
+      t.branch_id,
+      t.day_of_week
+    ),
   ]
 );
 

@@ -7,9 +7,9 @@ import {
   SidebarMenuItem,
 } from "../ui/sidebar";
 
-import { ShoppingCart, Box, Utensils } from "lucide-react";
+import { ShoppingCart, Box, Utensils, UserCog, Building } from "lucide-react";
 
-const mainItems = [
+const customerMainItems = [
   {
     name: "menu",
     icon: Utensils,
@@ -27,15 +27,38 @@ const mainItems = [
   },
 ];
 
+const adminMainItems = [
+  {
+    name: "menu",
+    icon: Utensils,
+    href: "/admin/menu",
+  },
+  {
+    name: "Users",
+    icon: UserCog,
+    href: "/admin/users",
+  },
+  {
+    name: "Branches",
+    icon: Building,
+    href: "/admin/branch",
+  },
+  {
+    name: "Orders",
+    icon: Box,
+    href: "/admin/orders",
+  },
+];
+
 export default function MainSection({
   role,
 }: Readonly<{ role: string | null }>) {
   return (
     <SidebarGroup>
-      {role === "customer" && (
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {mainItems.map((item) => {
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {role === "customer" &&
+            customerMainItems.map((item) => {
               const Icon = item.icon;
               return (
                 <SidebarMenuItem
@@ -54,9 +77,28 @@ export default function MainSection({
                 </SidebarMenuItem>
               );
             })}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      )}
+          {role === "admin" &&
+            adminMainItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <SidebarMenuItem
+                  key={item.name}
+                  className='flex flex-col gap-4'
+                >
+                  <SidebarMenuButton className='flex flex-col size-full'>
+                    <Link
+                      href={item.href}
+                      className='flex items-center gap-1 flex-col'
+                    >
+                      <Icon className='shrink-0' size={20} />
+                      <span className='text-[13px]'>{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+        </SidebarMenu>
+      </SidebarGroupContent>
     </SidebarGroup>
   );
 }

@@ -31,7 +31,7 @@ export const LoginHandler = (setLoading: (loading: boolean) => void) => {
           onSuccess: () => {
             toast.success("Login successful");
             router.push("/");
-            setLoading(false);
+            router.refresh();
           },
           onError: (ctx) => {
             toast.error(ctx.error.message);
@@ -39,13 +39,10 @@ export const LoginHandler = (setLoading: (loading: boolean) => void) => {
           },
         }
       );
-      setLoading(false);
       return data;
     } catch (error) {
       console.log(error);
       toast.error("An error occurred while processing your request");
-      setLoading(false);
-    } finally {
       setLoading(false);
     }
   };
