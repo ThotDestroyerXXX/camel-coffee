@@ -6,7 +6,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { MenuDetailSectionProps } from "../sections/menu-detail-section";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,13 +14,19 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
+interface MenuDetailDrawerProps
+  extends Omit<MenuDetailSectionProps, "children"> {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 export default function MenuDetailDrawer({
-  children,
   item,
-}: Readonly<MenuDetailSectionProps>) {
+  isOpen,
+  onClose,
+}: Readonly<MenuDetailDrawerProps>) {
   return (
-    <Drawer>
-      <DrawerTrigger asChild>{children}</DrawerTrigger>
+    <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Menu Detail</DrawerTitle>

@@ -1,0 +1,20 @@
+coffee shop with multiple locations
+
+Database : neon (PostgreSQL) ☑️
+ORM : Drizzle ☑️
+typesafety : tRPC ☑️
+framework : Next js ☑️
+validation : zod ☑️
+Authentication : Better auth ☑️
+store assets : imagekit ☑️
+ui library : shadcn ☑️
+payment : stripe
+
+Optimistic update : useOptimistic() hook
+Not found page : not-found file (by convention)
+private folder : add _ in front of folder 
+
+design : https://dribbble.com/shots/15629660-Kopinan-POS-System-for-Coffee-Shop
+https://dribbble.com/shots/22951308-Coffee-Shop-Dashboard-Management
+https://dribbble.com/shots/23539863-Kusale-Add-Product-Dashboard-Page
+https://dribbble.com/shots/23068868-Upload-Product-Form

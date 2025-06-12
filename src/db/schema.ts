@@ -105,12 +105,13 @@ export const verification = pgTable("verification", {
 
 export const branch = pgTable("branch", {
   id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  phone_number: text("phone_number").notNull(),
+  name: text("name").notNull().unique(),
+  phone_number: text("phone_number").notNull().unique(),
   google_map_address: text("google_map_address").notNull(),
-  latitude: decimal("latitude", { precision: 10, scale: 8 }),
-  longitude: decimal("longitude", { precision: 11, scale: 8 }),
-  is_active: boolean("is_active").notNull().default(true),
+  location_detail: text("location_detail").notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }).notNull(),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }).notNull(),
+  is_active: boolean("is_active").notNull().default(false),
   created_at: timestamp("created_at").notNull().defaultNow(),
   updated_at: timestamp("updated_at")
     .notNull()
@@ -323,7 +324,7 @@ export const branch_item_stock = pgTable(
     item_id: text("item_id")
       .notNull()
       .references(() => item.id, { onDelete: "cascade" }),
-    stock_quantity: integer("stock_quantity").notNull(),
+    stock_quantity: integer("stock_quantity").notNull().default(0),
     created_at: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [

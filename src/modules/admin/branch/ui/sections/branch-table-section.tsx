@@ -1,6 +1,7 @@
 "use client";
 import { InfiniteScroll } from "@/components/infinite-scroll";
 import NotFound from "@/components/not-found";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DEFAULT_LIMIT } from "@/constants";
@@ -70,18 +71,33 @@ function BranchTableSectionSuspense() {
       </section>
       <section className='mt-4'>
         {branches && branches.length > 0 ? (
-          <div className='flex flex-col gap-4'>
+          <div className='flex flex-row flex-wrap gap-4'>
             {branches.map((branch) => (
-              <div
-                key={branch.id}
-                className='p-4 border rounded-md shadow-sm hover:shadow-md transition-shadow'
-              >
-                <h3 className='text-lg font-semibold'>{branch.name}</h3>
-                <p className='text-sm text-gray-600'>
-                  {branch.google_map_address}
-                </p>
-                <p className='text-sm text-gray-500'>{branch.phone_number}</p>
-              </div>
+              <Link href={`/admin/branch/${branch.id}`} key={branch.id}>
+                <div className='p-4 border w-[20rem] flex flex-col gap-2 rounded-md shadow-sm hover:shadow-md transition-shadow'>
+                  <div className='flex flex-row gap-4 items-center'>
+                    <h3 className='text-lg font-semibold line-clamp-1'>
+                      {branch.name}
+                    </h3>
+                    <Badge className='text-red-600' variant={"outline"}>
+                      {branch.is_active ? "" : "Inactive"}
+                    </Badge>
+                  </div>
+                  <p className='text-sm text-gray-600 line-clamp-2'>
+                    {branch.location_detail}
+                    {", "}
+                    {branch.google_map_address}
+                  </p>
+                  <div className='flex justify-between'>
+                    <p className='text-sm text-gray-500 line-clamp-1'>
+                      {branch.phone_number}
+                    </p>
+                    <p className='text-blue-500 hover:underline text-sm'>
+                      View Details &gt;
+                    </p>
+                  </div>
+                </div>
+              </Link>
             ))}
             <InfiniteScroll
               isManual={false}

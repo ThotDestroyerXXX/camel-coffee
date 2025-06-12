@@ -1,7 +1,7 @@
 import { menuRouter } from "@/modules/admin/menu/server/menu/procedure";
 import { createTRPCRouter } from "../init";
 import { drinkOptionRouter } from "@/modules/admin/menu/server/drink-option/procedure";
-import { userRouter } from "@/modules/admin/users/ui/server/procedure";
+import { userRouter } from "@/modules/admin/users/server/procedure";
 import { branchRouter } from "@/modules/admin/branch/server/procedure";
 export const appRouter = createTRPCRouter({
   drinkOption: drinkOptionRouter,

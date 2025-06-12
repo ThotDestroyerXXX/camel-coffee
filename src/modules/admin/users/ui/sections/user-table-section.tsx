@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import UserTableSkeleton from "../components/user-table-skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import NotFound from "@/components/not-found";
+import Link from "next/link";
 
 export default function UserTableSection() {
   return (
@@ -35,7 +36,7 @@ function UserTableSectionSuspense() {
 
   const users = data.pages.flatMap((page) => page.items);
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex flex-col'>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -44,16 +45,29 @@ function UserTableSectionSuspense() {
           setSearch(searchValue?.trim());
         }}
       >
-        <div className='flex items-center py-4'>
-          <Input
-            placeholder='Filter emails...'
-            defaultValue={search}
-            className='max-w-sm placeholder:text-gray-500'
-            name='search'
-          />
-          <Button variant='outline' className='ml-2'>
-            Search
-          </Button>
+        <div className='flex items-center w-full py-4 max-sm:flex-col max-sm:gap-8'>
+          <div className='flex items-center gap-2 flex-1 w-full'>
+            <Input
+              placeholder='Filter emails...'
+              defaultValue={search}
+              className='max-w-sm w-full placeholder:text-gray-500 max-sm:max-w-full'
+              name='search'
+            />
+            <Button variant='outline' className='ml-2'>
+              Search
+            </Button>
+          </div>
+          <div className='flex items-center gap-2 max-sm:w-full max-sm:flex-1'>
+            <Link href={`/admin/users/create`} className='max-sm:w-full'>
+              <Button
+                variant='outline'
+                disabled={query.isFetchingNextPage || query.isLoading}
+                className='max-sm:w-full'
+              >
+                Add User
+              </Button>
+            </Link>
+          </div>
         </div>
       </form>
       <DataTable columns={columns} data={users} />

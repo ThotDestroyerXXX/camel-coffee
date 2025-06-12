@@ -1,5 +1,5 @@
 import db from "@/db";
-import { user } from "@/db/schema";
+import { roleEnum, user } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { and, asc, eq, gt, ilike, not, or } from "drizzle-orm";
 import { z } from "zod";
@@ -62,5 +62,32 @@ export const userRouter = createTRPCRouter({
         items,
         nextCursor,
       };
+    }),
+
+  updateRole: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        role: z.enum(roleEnum.enumValues),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.userId || ctx.userRole !== "admin") {
+        throw new Error("User is not authenticated.");
+      }
+      const { userId, role } = input;
+
+      const updatedUser = await db
+        .update(user)
+        .set({ role })
+        .where(eq(user.id, userId))
+        .returning()
+        .execute();
+
+      if (updatedUser.length === 0) {
+        throw new Error("User not found or update failed.");
+      }
+
+      return updatedUser[0];
     }),
 });

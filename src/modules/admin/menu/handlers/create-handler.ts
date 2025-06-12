@@ -39,7 +39,7 @@ export const CreateHandler = (setLoading: (loading: boolean) => void) => {
     },
     onError: (error) => {
       setLoading(false);
-      toast.error("something went wrong: " + error.message);
+      ToastError(error);
     },
   });
 

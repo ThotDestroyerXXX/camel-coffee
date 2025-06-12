@@ -1,6 +1,5 @@
 import db from "@/db";
 import {
-  audit_log,
   drink_option_type,
   drink_option_value,
   item,
@@ -43,22 +42,6 @@ export const menuRouter = createTRPCRouter({
         .returning({ id: item.id })
         .execute();
 
-      await db.insert(audit_log).values({
-        user_id: ctx.userId,
-        action: "create",
-        entity_type: "item",
-        entity_id: newItem[0].id,
-        old_value: null,
-        new_value: JSON.stringify({
-          id: newItem[0].id,
-          name: name,
-          description: description,
-          price: price.toString(),
-          type: type,
-          drink_type: drink_type,
-          image_url: image,
-        }),
-      });
       if (type === "drink" && !variations) {
         throw new Error("Variations are required for drink items.");
       }
@@ -67,7 +50,7 @@ export const menuRouter = createTRPCRouter({
           if (!ctx.userId || ctx.userRole !== "admin") {
             throw new Error("User is not authenticated.");
           }
-          const drinkOptionValue = await db
+          await db
             .insert(item_drink_option)
             .values({
               item_id: newItem[0].id,
@@ -75,18 +58,6 @@ export const menuRouter = createTRPCRouter({
             })
             .returning()
             .execute();
-          await db.insert(audit_log).values({
-            user_id: ctx.userId,
-            action: "create",
-            entity_type: "item_drink_option",
-            entity_id: drinkOptionValue[0].id.toString(),
-            old_value: null,
-            new_value: JSON.stringify({
-              id: drinkOptionValue[0].id,
-              item_id: newItem[0].id,
-              drink_option_value_id: parseInt(variation),
-            }),
-          });
         });
       }
     }),
@@ -262,19 +233,6 @@ export const menuRouter = createTRPCRouter({
         throw new Error("Item not found.");
       }
 
-      await db.insert(audit_log).values({
-        user_id: ctx.userId,
-        action: "update",
-        entity_type: "item",
-        entity_id: itemId,
-        old_value: JSON.stringify({
-          is_available: !isAvailable,
-        }),
-        new_value: JSON.stringify({
-          is_available: isAvailable,
-        }),
-      });
-
       return updatedItem[0];
     }),
 
@@ -338,7 +296,7 @@ export const menuRouter = createTRPCRouter({
           .execute();
 
         for (const variation of variations) {
-          const drinkOptionValue = await db
+          await db
             .insert(item_drink_option)
             .values({
               item_id: id,
@@ -346,18 +304,6 @@ export const menuRouter = createTRPCRouter({
             })
             .returning()
             .execute();
-          await db.insert(audit_log).values({
-            user_id: ctx.userId,
-            action: "update",
-            entity_type: "item_drink_option",
-            entity_id: drinkOptionValue[0].id.toString(),
-            old_value: null,
-            new_value: JSON.stringify({
-              id: drinkOptionValue[0].id,
-              item_id: id,
-              drink_option_value_id: variation,
-            }),
-          });
         }
       } else if (type === "food") {
         await db
@@ -365,15 +311,6 @@ export const menuRouter = createTRPCRouter({
           .where(eq(item_drink_option.item_id, id))
           .execute();
       }
-
-      await db.insert(audit_log).values({
-        user_id: ctx.userId,
-        action: "update",
-        entity_type: "item",
-        entity_id: id,
-        old_value: JSON.stringify(existingItem[0]),
-        new_value: JSON.stringify(updatedItem[0]),
-      });
 
       return updatedItem[0];
     }),

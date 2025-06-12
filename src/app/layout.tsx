@@ -6,6 +6,7 @@ import Navbar from "@/components/navbar/navbar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import LayoutSidebar from "@/components/sidebar/layout-sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { ReactScan } from "@/components/react-scan";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
+      <ReactScan />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

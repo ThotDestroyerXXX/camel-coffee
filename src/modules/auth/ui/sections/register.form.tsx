@@ -1,5 +1,4 @@
 "use client";
-import { Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +8,8 @@ import { RegisterHandler } from "../../handlers/register-handler";
 import Loading from "@/components/loading";
 import GoogleIcon from "@/components/ui/google";
 import MicrosoftIcon from "@/components/ui/microsoft";
+import Image from "next/image";
+import camelCoffee from "@/../public/camel-coffee-logo.png";
 
 export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
@@ -22,10 +23,10 @@ export default function RegisterForm() {
         }}
         className='bg-muted m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]'
       >
-        <div className='bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6'>
+        <div className='bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pt-4 pb-6'>
           <div className='text-center'>
             <Link href='/' aria-label='go home' className='mx-auto block w-fit'>
-              <Coffee className='size-6' />
+              <Image src={camelCoffee} alt='logo' width={60} height={60} />
             </Link>
             <h1 className='text-title mb-1 mt-4 text-xl font-semibold'>
               Create a Tailark Account

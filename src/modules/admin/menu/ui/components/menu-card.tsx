@@ -3,7 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import Image from "next/image";
 import MenuDetailSection from "../sections/menu-detail-section";
 
-interface MenuCardProps {
+export interface MenuCardProps {
   item: {
     item: {
       drink_type: "coffee" | "non-coffee" | null;
@@ -53,7 +53,7 @@ export default function MenuCard({
     <MenuDetailSection item={item}>
       <div
         key={item.item.id}
-        className='p-4 border-muted border-2 gap-2 rounded-md flex flex-col hover:shadow-lg transition-shadow duration-200 w-[15rem] max-sm:w-[10rem]'
+        className='p-4 border-muted border-2 gap-2 rounded-md flex flex-col hover:shadow-lg transition-shadow duration-200 w-[15rem] max-sm:w-[10rem] h-[23rem]'
       >
         <Image
           src={item.item.image_url}

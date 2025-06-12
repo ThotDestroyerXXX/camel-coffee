@@ -22,7 +22,7 @@ export const updateAvailabilityHandler = (
     },
     onError: (error) => {
       setLoading(false);
-      toast.error("Failed to update item availability: " + error.message);
+      ToastError(error);
     },
   });
 

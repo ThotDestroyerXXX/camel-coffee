@@ -2,7 +2,7 @@
 
 import { useIsMobile } from "@/hooks/use-mobile";
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import MenuDetailSheet from "../components/menu-detail-sheet";
 import MenuDetailDrawer from "../components/menu-detail-drawer";
 
@@ -52,12 +52,33 @@ export default function MenuDetailSection({
   item,
 }: Readonly<MenuDetailSectionProps>) {
   const isMobile = useIsMobile();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
   return (
     <>
-      {!isMobile ? (
-        <MenuDetailSheet item={item}>{children}</MenuDetailSheet>
-      ) : (
-        <MenuDetailDrawer item={item}>{children}</MenuDetailDrawer>
+      {/* Clickable wrapper element */}
+      <div onClick={handleOpen}>{children}</div>
+
+      {/* Only render details when open */}
+      {isOpen && (
+        <>
+          {!isMobile ? (
+            <MenuDetailSheet
+              item={item}
+              isOpen={isOpen}
+              onClose={handleClose}
+            />
+          ) : (
+            <MenuDetailDrawer
+              item={item}
+              isOpen={isOpen}
+              onClose={handleClose}
+            />
+          )}
+        </>
       )}
     </>
   );

@@ -9,19 +9,24 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import Image from "next/image";
 import { MenuDetailSectionProps } from "../sections/menu-detail-section";
 import Link from "next/link";
 
+interface MenuDetailSheetProps
+  extends Omit<MenuDetailSectionProps, "children"> {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 export default function MenuDetailSheet({
-  children,
   item,
-}: Readonly<MenuDetailSectionProps>) {
+  isOpen,
+  onClose,
+}: Readonly<MenuDetailSheetProps>) {
   return (
-    <Sheet>
-      <SheetTrigger asChild>{children}</SheetTrigger>
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Menu Detail</SheetTitle>
