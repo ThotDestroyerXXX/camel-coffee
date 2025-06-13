@@ -35,7 +35,7 @@ export default function DayTimeInput({
           name={`time-from-${day}`}
           defaultValue='09:00'
           disabled={disabled}
-          className='bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+          className='time-input'
         />
       </div>
       <div className='flex flex-col gap-2'>
@@ -48,7 +48,7 @@ export default function DayTimeInput({
           name={`time-to-${day}`}
           defaultValue='21:00'
           disabled={disabled}
-          className='bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+          className='time-input'
         />
       </div>
       <div className='flex flex-col gap-2'>

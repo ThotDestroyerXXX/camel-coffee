@@ -189,4 +189,8 @@ body {
   h1 {
     @apply text-3xl font-semibold tracking-tight max-sm:text-2xl;
   }
+
+  .time-input {
+    @apply bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none [&::-webkit-datetime-edit-ampm-field]:hidden;
+  }
 }
