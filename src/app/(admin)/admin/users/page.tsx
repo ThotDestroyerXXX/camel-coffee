@@ -5,6 +5,7 @@ import { HydrateClient, trpc } from "@/trpc/server";
 export default function Page() {
   void trpc.user.getMany.prefetchInfinite({
     limit: DEFAULT_LIMIT,
+    search: undefined,
   });
   return (
     <HydrateClient>

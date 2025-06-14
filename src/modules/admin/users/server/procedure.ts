@@ -1,8 +1,11 @@
 import db from "@/db";
-import { roleEnum, user } from "@/db/schema";
+import { account, roleEnum, user } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { and, asc, eq, gt, ilike, not, or } from "drizzle-orm";
+import { createUserValidation } from "@/validations/user";
+import { and, desc, eq, ilike, lt, not, or } from "drizzle-orm";
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
+import { auth } from "@/lib/auth";
 
 export const userRouter = createTRPCRouter({
   getMany: protectedProcedure
@@ -37,10 +40,10 @@ export const userRouter = createTRPCRouter({
             not(eq(user.id, ctx.userId)),
             cursor
               ? or(
-                  gt(user.createdAt, cursor.createdAt),
+                  lt(user.createdAt, cursor.createdAt),
                   and(
                     eq(user.createdAt, cursor.createdAt),
-                    gt(user.id, cursor.id)
+                    lt(user.id, cursor.id)
                   )
                 )
               : undefined,
@@ -48,7 +51,7 @@ export const userRouter = createTRPCRouter({
           )
         )
         .limit(limit + 1)
-        .orderBy(asc(user.createdAt), asc(user.id))
+        .orderBy(desc(user.createdAt), desc(user.id))
         .execute();
 
       const hasMore = users.length > limit;
@@ -89,5 +92,66 @@ export const userRouter = createTRPCRouter({
       }
 
       return updatedUser[0];
+    }),
+
+  create: protectedProcedure
+    .input(
+      createUserValidation.extend({
+        image: z.string().nonempty({
+          message: "Image is required",
+        }),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.userId || ctx.userRole !== "admin") {
+        throw new Error("User is not authenticated.");
+      }
+      const {
+        name,
+        email,
+        password,
+        role,
+        image,
+        google_map_address,
+        latitude,
+        longitude,
+        phone,
+      } = input;
+
+      const newUser = await db
+        .insert(user)
+        .values({
+          id: uuidv4(),
+          name,
+          email,
+          emailVerified: true,
+          role,
+          image,
+          phoneNumber: phone,
+          google_map_address,
+          latitude: latitude.toString(),
+          longitude: longitude.toString(),
+        })
+        .returning({ id: user.id })
+        .execute();
+
+      if (newUser.length === 0) {
+        throw new Error("User creation failed.");
+      }
+
+      const context = await auth.$context;
+      const hash = await context.password.hash(password);
+
+      await db.insert(account).values({
+        id: uuidv4(),
+        accountId: uuidv4(),
+        userId: newUser[0].id,
+        providerId: "credential",
+        password: hash,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      return newUser[0];
     }),
 });

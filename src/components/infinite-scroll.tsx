@@ -35,7 +35,7 @@ export const InfiniteScroll = ({
   return (
     <div className='flex flex-col w-full items-center justify-center'>
       <div ref={targetRef} className='h-1 w-full' />
-      {hasNextPage ? (
+      {hasNextPage && (
         <Button
           variant='default'
           onClick={() => fetchNextPage()}
@@ -43,8 +43,6 @@ export const InfiniteScroll = ({
         >
           {isFetchingNextPage ? "Loading..." : "Load More"}
         </Button>
-      ) : (
-        <p className='text-gray-500'>No more items to load</p>
       )}
     </div>
   );

@@ -19,7 +19,7 @@ export default function RoleSelect({
   className,
 }: Readonly<RoleSelectProps>) {
   return (
-    <Select disabled={disabled} name={"role"}>
+    <Select disabled={disabled} name={"role"} defaultValue={undefined}>
       <SelectTrigger className={cn("w-full", className)}>
         <SelectValue placeholder='Select User Role' />
       </SelectTrigger>

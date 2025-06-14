@@ -5,6 +5,8 @@ import {
   branch_operating_hours,
   dayEnum,
   item,
+  seller_branch_assignment,
+  user,
 } from "@/db/schema";
 import {
   baseProcedure,
@@ -12,7 +14,7 @@ import {
   protectedProcedure,
 } from "@/trpc/init";
 import { branchValidation } from "@/validations/branch";
-import { and, asc, eq, gt, ilike, or } from "drizzle-orm";
+import { and, desc, eq, ilike, isNull, lt, or } from "drizzle-orm";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 
@@ -45,10 +47,10 @@ export const branchRouter = createTRPCRouter({
           and(
             cursor
               ? or(
-                  gt(branch.created_at, cursor.createdAt),
+                  lt(branch.created_at, cursor.createdAt),
                   and(
                     eq(branch.created_at, cursor.createdAt),
-                    gt(branch.id, cursor.id)
+                    lt(branch.id, cursor.id)
                   )
                 )
               : undefined,
@@ -56,7 +58,7 @@ export const branchRouter = createTRPCRouter({
           )
         )
         .limit(limit + 1)
-        .orderBy(asc(branch.created_at), asc(branch.id))
+        .orderBy(desc(branch.created_at), desc(branch.id))
         .execute();
 
       const hasMore = branches.length > limit;
@@ -172,8 +174,17 @@ export const branchRouter = createTRPCRouter({
       const { id } = input;
 
       const branchData = await db
-        .select()
+        .select({
+          branch: branch,
+          sellerId: seller_branch_assignment.user_id,
+          sellerEmail: user.email,
+        })
         .from(branch)
+        .leftJoin(
+          seller_branch_assignment,
+          eq(seller_branch_assignment.branch_id, branch.id)
+        )
+        .leftJoin(user, eq(user.id, seller_branch_assignment.user_id))
         .where(eq(branch.id, id))
         .execute();
 
@@ -198,5 +209,135 @@ export const branchRouter = createTRPCRouter({
           return acc;
         }, {} as Record<string, { from: string; to: string; closed: boolean }>),
       };
+    }),
+
+  getUnassignedSellers: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.userId || ctx.userRole !== "admin") {
+      throw new Error("User is not authenticated.");
+    }
+
+    const sellers = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      })
+      .from(user)
+      .leftJoin(
+        seller_branch_assignment,
+        eq(seller_branch_assignment.user_id, user.id)
+      )
+      .where(
+        and(eq(user.role, "seller"), isNull(seller_branch_assignment.user_id))
+      )
+      .execute();
+
+    return sellers;
+  }),
+
+  assignSeller: protectedProcedure
+    .input(
+      z.object({
+        branchId: z.string().nonempty({
+          message: "Branch ID is required",
+        }),
+        sellerId: z.string().nonempty({
+          message: "Seller ID is required",
+        }),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.userId || ctx.userRole !== "admin") {
+        throw new Error("User is not authenticated.");
+      }
+
+      const { branchId, sellerId } = input;
+
+      const existingBranch = await db
+        .select()
+        .from(branch)
+        .where(eq(branch.id, branchId))
+        .execute();
+
+      if (existingBranch.length === 0) {
+        throw new Error("Branch not found");
+      }
+
+      const existingAssignment = await db
+        .select()
+        .from(seller_branch_assignment)
+        .where(
+          and(
+            eq(seller_branch_assignment.branch_id, branchId),
+            eq(seller_branch_assignment.user_id, sellerId)
+          )
+        )
+        .execute();
+
+      if (existingAssignment.length > 0) {
+        throw new Error("Seller is already assigned to this branch");
+      }
+
+      await db
+        .insert(seller_branch_assignment)
+        .values({
+          id: uuidv4(),
+          branch_id: branchId,
+          user_id: sellerId,
+        })
+        .execute();
+
+      await db
+        .update(user)
+        .set({
+          phoneNumber: existingBranch[0].phone_number,
+          google_map_address: existingBranch[0].google_map_address,
+          latitude: existingBranch[0].latitude,
+          longitude: existingBranch[0].longitude,
+        })
+        .where(eq(user.id, sellerId))
+        .execute();
+    }),
+
+  unassignSeller: protectedProcedure
+    .input(
+      z.object({
+        branchId: z.string().nonempty({
+          message: "Branch ID is required",
+        }),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.userId || ctx.userRole !== "admin") {
+        throw new Error("User is not authenticated.");
+      }
+
+      const { branchId } = input;
+
+      const assignment = await db
+        .select()
+        .from(seller_branch_assignment)
+        .where(eq(seller_branch_assignment.branch_id, branchId))
+        .execute();
+
+      if (assignment.length === 0) {
+        throw new Error("No seller assigned to this branch");
+      }
+
+      await db
+        .delete(seller_branch_assignment)
+        .where(eq(seller_branch_assignment.branch_id, branchId))
+        .execute();
+
+      await db
+        .update(branch)
+        .set({
+          is_active: false,
+        })
+        .where(eq(branch.id, branchId))
+        .execute()
+        .catch(() => {
+          throw new Error("Failed to update branch after unassigning seller");
+        });
     }),
 });

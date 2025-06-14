@@ -12,9 +12,7 @@ interface CreateBranchHandler {
   longitude: number;
 }
 
-export default function CreateBranchHandler(
-  setLoading: (loading: boolean) => void
-) {
+export function CreateBranchHandler(setLoading: (loading: boolean) => void) {
   const router = useRouter();
   const utils = trpc.useUtils();
 
@@ -110,5 +108,60 @@ export default function CreateBranchHandler(
 
   return {
     handleSubmit,
+  };
+}
+
+export function AssignSellerHandler(setLoading: (loading: boolean) => void) {
+  const router = useRouter();
+  const utils = trpc.useUtils();
+
+  const { mutate } = trpc.branch.assignSeller.useMutation({
+    onSuccess: async () => {
+      toast.success("Seller assigned successfully!");
+      await utils.invalidate();
+      router.refresh();
+    },
+    onError: (error) => {
+      ToastError(error);
+      setLoading(false);
+    },
+  });
+
+  const handleAssignSeller = async ({
+    branchId,
+    sellerId,
+  }: Readonly<{ branchId: string; sellerId: string }>) => {
+    setLoading(true);
+    mutate({ branchId, sellerId });
+  };
+
+  return {
+    handleAssignSeller,
+  };
+}
+
+export function UnassignSellerHandler() {
+  const router = useRouter();
+  const utils = trpc.useUtils();
+
+  const { mutate } = trpc.branch.unassignSeller.useMutation({
+    onSuccess: async () => {
+      toast.success("Seller unassigned successfully!");
+      await utils.invalidate();
+      router.refresh();
+    },
+    onError: (error) => {
+      ToastError(error);
+    },
+  });
+
+  const handleUnassignSeller = async ({
+    branchId,
+  }: Readonly<{ branchId: string }>) => {
+    mutate({ branchId });
+  };
+
+  return {
+    handleUnassignSeller,
   };
 }

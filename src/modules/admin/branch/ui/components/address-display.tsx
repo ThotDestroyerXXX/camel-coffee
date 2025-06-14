@@ -24,6 +24,7 @@ const AddressDisplay = memo(
       <Textarea
         disabled
         aria-disabled
+        name='google_map_address'
         className='text-sm text-muted-foreground block text-justify'
         placeholder='Select a location on the map to see the address'
         value={address}

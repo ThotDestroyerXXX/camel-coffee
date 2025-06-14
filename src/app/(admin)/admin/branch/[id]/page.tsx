@@ -6,6 +6,7 @@ export default async function Page({
 }: Readonly<{ params: Promise<{ id: string }> }>) {
   const { id } = await params;
   void trpc.branch.getById.prefetch({ id: id });
+  void trpc.branch.getUnassignedSellers.prefetch();
   return (
     <HydrateClient>
       <BranchDetailView branchId={id} />

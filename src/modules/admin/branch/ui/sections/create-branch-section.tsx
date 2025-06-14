@@ -10,7 +10,7 @@ import BranchFormFields from "../components/branch-form-field";
 import OperatingHoursSection from "../components/operating-hours-section";
 import MapSection from "@/components/map/interactive-map";
 import AddressDisplay from "../components/address-display";
-import CreateBranchHandler from "../../handlers/create-handler";
+import { CreateBranchHandler } from "../../handlers/branch-handler";
 import Loading from "@/components/loading";
 
 function CreateBranchSectionSuspense() {

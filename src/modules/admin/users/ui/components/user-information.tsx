@@ -23,6 +23,7 @@ export default function UserInformation({
             <Input
               id='name'
               type='text'
+              name='name'
               placeholder='full name'
               disabled={loading}
             />
@@ -35,6 +36,7 @@ export default function UserInformation({
             <Input
               id='email'
               type='email'
+              name='email'
               placeholder='m@example.com'
               disabled={loading}
             />
@@ -45,10 +47,15 @@ export default function UserInformation({
             <Lock className='w-4' />
             Password
           </Label>
-          <Input id='password' type='password' disabled={loading} />
+          <Input
+            id='password'
+            type='password'
+            name='password'
+            disabled={loading}
+          />
         </div>
         <div className='flex flex-col flex-1 gap-2'>
-          <Label htmlFor='email'>
+          <Label htmlFor='phone_number'>
             <Phone className='w-4' />
             Phone Number
           </Label>
